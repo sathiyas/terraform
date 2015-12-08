@@ -6,12 +6,13 @@ import (
 	"encoding/base64"
 	"fmt"
 	"io"
-	"mime/multipart"
 	"net/textproto"
 	"strconv"
 
 	"github.com/hashicorp/terraform/helper/hashcode"
 	"github.com/hashicorp/terraform/helper/schema"
+
+	"github.com/sthulb/mime/multipart"
 )
 
 func resourceCloudinitConfig() *schema.Resource {
@@ -170,6 +171,7 @@ func renderPartsToWriter(parts cloudInitParts, writer io.Writer) error {
 	}
 
 	writer.Write([]byte(fmt.Sprintf("Content-Type: multipart/mixed; boundary=\"%s\"\n", mimeWriter.Boundary())))
+	writer.Write([]byte("MIME-Version: 1.0\r\n"))
 
 	for _, part := range parts {
 		header := textproto.MIMEHeader{}
@@ -178,6 +180,9 @@ func renderPartsToWriter(parts cloudInitParts, writer io.Writer) error {
 		} else {
 			header.Set("Content-Type", part.ContentType)
 		}
+
+		header.Set("MIME-Version", "1.0")
+		header.Set("Content-Transfer-Encoding", "7bit")
 
 		if part.Filename != "" {
 			header.Set("Content-Disposition", fmt.Sprintf(`attachment; filename="%s"`, part.Filename))
