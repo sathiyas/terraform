@@ -51,7 +51,7 @@ func validateArmResourceGroupName(v interface{}, k string) (ws []string, es []er
 		es = append(es, fmt.Errorf("%q may not end with a period", k))
 	}
 
-	if matched := regexp.MustCompile(`^[\(\)\.a-zA-Z0-9_-]$`).Match([]byte(value)); !matched {
+	if matched := regexp.MustCompile(`[\(\)\.a-zA-Z0-9_-]`).Match([]byte(value)); !matched {
 		es = append(es, fmt.Errorf("%q may only contain alphanumeric characters, dash, underscores, parentheses and periods", k))
 	}
 

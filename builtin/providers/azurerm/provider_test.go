@@ -55,8 +55,4 @@ func testAccPreCheck(t *testing.T) {
 				"ARM_CLIENT_SECRET and ARM_TENANT_ID must be set for acceptance tests")
 		}
 	}
-
-	if v := os.Getenv("AZURE_STORAGE"); v == "" {
-		t.Fatal("AZURE_STORAGE must be set for acceptance tests")
-	}
 }

@@ -12,11 +12,10 @@ import (
 func Provider() terraform.ResourceProvider {
 	return &schema.Provider{
 		Schema: map[string]*schema.Schema{
-			"arm_config_file": &schema.Schema{
+			"arm_credentials": &schema.Schema{
 				Type:         schema.TypeString,
 				Optional:     true,
-				Default:      "",
-				DefaultFunc:  schema.EnvDefaultFunc("ARM_CONFIG_FILE", nil),
+				DefaultFunc:  schema.EnvDefaultFunc("ARM_CREDENTIALS", nil),
 				ValidateFunc: validateArmConfigFile,
 			},
 
@@ -59,7 +58,7 @@ func Provider() terraform.ResourceProvider {
 type Config struct {
 	ManagementURL string
 
-	ArmConfig string
+	ArmCredentials string
 
 	SubscriptionID string
 	ClientID       string
@@ -67,10 +66,10 @@ type Config struct {
 	TenantID       string
 }
 
-const noConfigError = `Credentials must be provided either via arm_config_file, or via
-subscription_id, client_id, client_secret and tenant_id. Please see
-the provider documentation for more information on how to obtain these
-credentials.`
+const noConfigError = `Credentials must be provided either via arm_credentials
+(encoded as JSON), or via subscription_id, client_id, client_secret and
+tenant_id. Please see the provider documentation for more information on
+how to obtain these credentials.`
 
 func providerConfigure(d *schema.ResourceData) (interface{}, error) {
 	config := Config{
@@ -81,10 +80,10 @@ func providerConfigure(d *schema.ResourceData) (interface{}, error) {
 	}
 
 	// check if credentials file is provided:
-	armConfig := d.Get("arm_config_file").(string)
-	if armConfig != "" {
+	armCredentials := d.Get("arm_credentials").(string)
+	if armCredentials != "" {
 		// then, load the settings from that:
-		if err := config.readArmSettings(armConfig); err != nil {
+		if err := config.readArmSettings(armCredentials); err != nil {
 			return nil, err
 		}
 	}

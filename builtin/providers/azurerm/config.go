@@ -162,7 +162,7 @@ func (c *Config) getArmClient() (*ArmClient, error) {
 // armCredentialsProvided is a helper method which indicates whether or not the
 // credentials required for authenticating against the ARM APIs were provided.
 func (c *Config) armCredentialsProvided() bool {
-	return c.ArmConfig != "" || c._armCredentialsProvided()
+	return c.ArmCredentials != "" || c._armCredentialsProvided()
 }
 func (c *Config) _armCredentialsProvided() bool {
 	return !(c.SubscriptionID == "" || c.ClientID == "" || c.ClientSecret == "" || c.TenantID == "")

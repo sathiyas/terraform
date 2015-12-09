@@ -16,7 +16,8 @@ func resourceArmVirtualNetwork() *schema.Resource {
 	return &schema.Resource{
 		Create: resourceArmVirtualNetworkCreate,
 		Read:   resourceArmVirtualNetworkRead,
-		Update: resourceArmVirtualNetworkUpdate,
+		// Create is idempotent and is also used for updating
+		Update: resourceArmVirtualNetworkCreate,
 		Delete: resourceArmVirtualNetworkDelete,
 
 		Schema: map[string]*schema.Schema{
@@ -101,12 +102,7 @@ func resourceArmVirtualNetworkCreate(d *schema.ResourceData, meta interface{}) e
 		return err
 	}
 
-	// if res.Response.StatusCode != http.StatusAccepted {
-	// 	return fmt.Errorf("Creation request was denies: code: %d", res.Response.StatusCode)
-	// }
-
 	d.SetId(name)
-	d.Set("resGroup", resGroup)
 
 	// Wait for the resource group to become available
 	// TODO(jen20): Is there any need for this?
@@ -128,7 +124,7 @@ func resourceArmVirtualNetworkCreate(d *schema.ResourceData, meta interface{}) e
 func resourceArmVirtualNetworkRead(d *schema.ResourceData, meta interface{}) error {
 	vnetClient := meta.(*ArmClient).vnetClient
 
-	name := d.Get("name").(string)
+	name := d.Id()
 	resGroup := d.Get("resource_group_name").(string)
 
 	log.Printf("[INFO] Sending virtual network read request to ARM.")
@@ -145,10 +141,9 @@ func resourceArmVirtualNetworkRead(d *schema.ResourceData, meta interface{}) err
 	}
 	vnet := *resp.Properties
 
-	// update all the appropriate values:
+	// update appropriate values
 	d.Set("address_space", vnet.AddressSpace.AddressPrefixes)
 
-	// read state of subnets:
 	subnets := &schema.Set{
 		F: resourceAzureSubnetHash,
 	}
@@ -166,7 +161,6 @@ func resourceArmVirtualNetworkRead(d *schema.ResourceData, meta interface{}) err
 	}
 	d.Set("subnet", subnets)
 
-	// now; dns servers:
 	dnses := []string{}
 	for _, dns := range *vnet.DhcpOptions.DNSServers {
 		dnses = append(dnses, dns)
@@ -174,13 +168,6 @@ func resourceArmVirtualNetworkRead(d *schema.ResourceData, meta interface{}) err
 	d.Set("dns_servers", dnses)
 
 	return nil
-}
-
-// resourceArmVirtualNetworkUpdate goes ahead and updates the corresponding ARM virtual network.
-func resourceArmVirtualNetworkUpdate(d *schema.ResourceData, meta interface{}) error {
-	// considering Create's idempotency, Update is simply a proxy for it...
-	// Update has been left as a separate function here for utmost clarity:
-	return resourceArmVirtualNetworkCreate(d, meta)
 }
 
 // resourceArmVirtualNetworkDelete deletes the specified ARM virtual network.
