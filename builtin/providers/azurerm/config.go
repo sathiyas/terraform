@@ -4,12 +4,12 @@ import (
 	"encoding/json"
 	"fmt"
 
-	"github.com/Azure/azure-sdk-for-go/Godeps/_workspace/src/github.com/Azure/go-autorest/autorest/azure"
-	"github.com/Azure/azure-sdk-for-go/arm/compute"
-	"github.com/Azure/azure-sdk-for-go/arm/network"
-	"github.com/Azure/azure-sdk-for-go/arm/resources"
-	"github.com/Azure/azure-sdk-for-go/arm/scheduler"
-	"github.com/Azure/azure-sdk-for-go/arm/storage"
+	"github.com/hashicorp/azure-sdk-for-go/Godeps/_workspace/src/github.com/Azure/go-autorest/autorest/azure"
+	"github.com/hashicorp/azure-sdk-for-go/arm/compute"
+	"github.com/hashicorp/azure-sdk-for-go/arm/network"
+	"github.com/hashicorp/azure-sdk-for-go/arm/resources"
+	"github.com/hashicorp/azure-sdk-for-go/arm/scheduler"
+	"github.com/hashicorp/azure-sdk-for-go/arm/storage"
 	"github.com/hashicorp/terraform/helper/pathorcontents"
 )
 
